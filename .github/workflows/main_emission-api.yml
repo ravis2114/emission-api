@@ -60,4 +60,4 @@ jobs:
         with:
           app-name: 'emission-api'
           slot-name: 'Production'
-          publish-profile: ${{ secrets.AZUREAPPSERVICE_PUBLISHPROFILE_900E4075677444AFA32DF09469143EDF }}
+          publish-profile: ${{ secrets.AZUREAPPSERVICE_PUBLISHPROFILE_D45F62E8E62F4AE2B66C8A8501A03E04 }}
