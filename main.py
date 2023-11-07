@@ -11,7 +11,7 @@ from model_arch import Net
 from utils import input_template
 
 #loading model
-model = Net(46,4)
+model = Net(40,5)
 model.load_state_dict(torch.load('model.pth', map_location=torch.device('cpu')))
 model.eval()
 
@@ -34,45 +34,39 @@ class InputData(BaseModel):
     Start_Port_Id : float
     End_Port_Id : float
     Total_Distance: float
-    Length: float
-    Breadth : float
-    Depth : float
-    Draft : float
-    Grt : float
     Dwt : float
-    Total_Cargo_Onboard : float
-    Cargo_Mt : float
     Avg_Actual_Speed_Logged : float
-    Avg_Draft_Fore : float
-    Avg_Draft_After : float
-    Avg_Displacement : float
-    Tot_ME_Run_Hours : float
-    Log_Time_Duration : float
-    Avg_AE_Power : float
     Vessel_Type : str
     Sub_Type : str
+    average_ME_mcr : float
+    Calm : float
+    Smooth : float
+    Slight : float
+    Moderate : float
+    Rough : float
+    Very_rough : float
+    High : float
+    Very_high : float
+    Phenomenal : float
 def api_input_transform(input_template, api_input):
     input_template = input_template.copy()
     input_template[' Start_Port_Id'] = api_input['Start_Port_Id']
     input_template[' End_Port_Id'] = api_input['End_Port_Id']
     input_template[' Total_Distance'] = api_input['Total_Distance']
-    input_template['Length'] = api_input['Length']
-    input_template['Breadth'] = api_input['Breadth']
-    input_template['Depth'] = api_input['Depth']
-    input_template['Draft'] = api_input['Draft']
-    input_template['Grt'] = api_input['Grt']
     input_template['Dwt'] = api_input['Dwt']
-    input_template[' Total_Cargo_Onboard'] = api_input['Total_Cargo_Onboard']
-    input_template[' Cargo_Mt'] = api_input['Cargo_Mt']
     input_template[' Avg_Actual_Speed_Logged'] = api_input['Avg_Actual_Speed_Logged']
-    input_template[' Avg_Draft_Fore'] = api_input['Avg_Draft_Fore']
-    input_template[' Avg_Draft_After'] = api_input['Avg_Draft_After']
-    input_template['Avg_Displacement'] = api_input['Avg_Displacement']
-    input_template[' Tot_ME_Run_Hours'] = api_input['Tot_ME_Run_Hours']
-    input_template['Log_Time_Duration'] = api_input['Log_Time_Duration']
-    input_template['Avg_AE_Power'] = api_input['Avg_AE_Power']
     input_template['Vessel_Type_' + api_input['Vessel_Type']] = 1
     input_template['Sub_Type_' + api_input['Sub_Type']] = 1
+    input_template['average_ME_mcr'] = api_input['average_ME_mcr']
+    input_template['Calm'] = api_input['Calm']
+    input_template['Smooth'] = api_input['Smooth']
+    input_template['Slight'] = api_input['Slight']
+    input_template['Moderate'] = api_input['Moderate']
+    input_template['Rough'] = api_input['Rough']
+    input_template['Very rough'] = api_input['Very_rough']
+    input_template['High'] = api_input['High']
+    input_template['Very high'] = api_input['Very_high']
+    input_template['Phenomenal'] = api_input['Phenomenal']
     return input_template
 def preprocess_api_input(final_api_input):
     final_api_input = final_api_input.copy()
@@ -107,7 +101,7 @@ async def predict(api_input: InputData):
     with torch.no_grad():
         preds = model(final_api_input)
         preds = scaler_y.inverse_transform(preds)
-        pred_df = pd.DataFrame(preds, columns=['Total_Fuel_Consumption', 'Total Co2', 'Total Nox', 'Total Sox'])
+        pred_df = pd.DataFrame(preds, columns=['Total_Fuel_Consumption', 'Total Co2', 'Total Nox', 'Total Sox', 'ETA'])
         pred_df = pred_df.round(2)
         pred_df = pred_df.to_dict('records')
     return pred_df
